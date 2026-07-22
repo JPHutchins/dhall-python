@@ -41,15 +41,16 @@ Supports the following:
 - Operating Systems
   - Windows
   - Mac OS
-  - Linux (manylinux_2_24_x86_64)
-- Python versions
-  - 3.7
-  - 3.8
-  - 3.9
+  - Linux (manylinux_2_28_x86_64)
+- Python versions (one `abi3` wheel per OS covers the whole range)
   - 3.10
   - 3.11
+  - 3.12
+  - 3.13
+  - 3.14
+  - 3.15
 
-Python 3.5 and 3.6 support is available in older versions of dhall-python.
+Python 3.7 through 3.9 support is available in older versions of dhall-python.
 
 dhall-python implements a similar API to Python's [json
 module](https://docs.python.org/3/library/json.html):
