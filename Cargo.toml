@@ -1,9 +1,13 @@
 [package]
 name = "dhall"
 version = "0.1.17"
-authors = ["Simon Zeng <contact@simonzeng.com>", "Tristan Cacqueray <tdecacqu@redhat.com>", "Matthias Endler <matthias-endler@gmx.net>"]
+authors = [
+    "Simon Zeng <contact@simonzeng.com>",
+    "Tristan Cacqueray <tdecacqu@redhat.com>",
+    "Matthias Endler <matthias-endler@gmx.net>",
+]
 description = "Python bindings for dhall, a functional configuration language"
-edition = "2018"
+edition = "2021"
 license = "Apache-2.0"
 repository = "https://github.com/s-zeng/dhall-python"
 homepage = "https://github.com/s-zeng/dhall-python"
@@ -11,28 +15,21 @@ readme = "README.md"
 keywords = ["dhall", "python"]
 
 [dependencies]
-serde_json = "1"
 serde = "1"
-serde_derive = "1"
-serde_dhall = "0.12"
-pyo3 = "0.19"
-thiserror = "1"
-openssl = {version = "0.10", features = ["vendored"]}
+serde_dhall = "0.13"
+pyo3 = { version = "0.29", features = ["abi3-py310", "extension-module"] }
+thiserror = "2"
+openssl = { version = "0.10", features = ["vendored"] }
 
 [lib]
 name = "dhall"
 crate-type = ["rlib", "cdylib"]
 
 [features]
-# We must make this feature optional to build binaries such as the profiling crate
 default = ["pyo3/extension-module"]
 
-# [workspace]
-# members = [ "profiling" ]
-
-# [profile.release]
-# codegen-units = 1
-# debug = false
-# incremental = false
-# lto = true
-# opt-level = 3
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+option_if_let_else = "allow"
+single_match_else = "allow"
