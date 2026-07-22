@@ -4,6 +4,8 @@ import os
 from . import dhall as _dhall
 from .dhall import __version__, dump, dumps, loads
 
+__all__ = ["__version__", "dump", "dumps", "load", "loads"]
+
 
 @contextlib.contextmanager
 def remember_cwd():

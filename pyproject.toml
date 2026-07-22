@@ -39,10 +39,15 @@ compatibility = "manylinux_2_28"
 skip-auditwheel = false
 sdist-include = ["dhall/*"]
 
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E501"]
+
 [dependency-groups]
 dev = [
     "pytest~=7.0",
     "pytest-benchmark",
     "hypothesis",
     "maturin>=1.7,<2",
+    "ruff>=0.15,<0.16",
 ]

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 cargo fmt
-isort .
-black .
+ruff format .
+ruff check --fix .

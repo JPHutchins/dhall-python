@@ -50,9 +50,7 @@ def test_list_naturals(lst):
     assert dhall.loads(dhall.dumps(lst)) == lst
 
 
-@given(
-    st.lists(st.floats(min_value=-(2**53) + 1, max_value=(2**53) - 1), min_size=1)
-)
+@given(st.lists(st.floats(min_value=-(2**53) + 1, max_value=(2**53) - 1), min_size=1))
 def test_list_floats(lst):
     assert dhall.loads(dhall.dumps(lst)) == pytest.approx(lst)
 
