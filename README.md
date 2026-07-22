@@ -101,14 +101,14 @@ If you have already installed the `stable` version, make sure it is up-to-date:
 rustup update stable
 ```
 
-After that, you can compile the current version of dhall-python and execute all tests and benchmarks with the following commands:
+After that, build the extension and run the full check suite (ruff, mypy, pyright, clippy, and the tests) with:
 
 ```
-make install
-make test
+uv sync
+uv run camas
 ```
 
-🤫 Pssst!... run `make help` to learn more.
+Tasks are defined in `tasks.py`; `uv run camas --list` shows them and `uv run camas fmt` auto-formats.
 
 
 [dhall-rust]: https://github.com/Nadrieril/dhall-rust
