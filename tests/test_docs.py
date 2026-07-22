@@ -1,7 +1,7 @@
 import dhall
 
 
-def test_docs():
+def test_docs() -> None:
     assert (
         dhall.dumps({"keyA": 81, "keyB": True, "keyC": "value"})
         == '{ keyA = 81, keyB = True, keyC = "value" }'

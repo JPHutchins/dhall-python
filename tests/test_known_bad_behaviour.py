@@ -28,7 +28,7 @@ st_failing_json = st.recursive(
 
 
 @given(st.none())
-def test_none(xs):
+def test_none(xs: None) -> None:
     assert dhall.loads(dhall.dumps(xs)) != xs
     assert dhall.loads(dhall.dumps(xs)) == {}
 
@@ -36,7 +36,7 @@ def test_none(xs):
 # test lists of lists of integers w/ empty lists errors
 # e.g. [[3, 4], [6], []]
 @given(st.lists(st.lists(st_int), min_size=1).map(lambda lst: lst + [[]]))
-def test_empty_list_in_list_of_lists(xs):
+def test_empty_list_in_list_of_lists(xs: list[list[int]]) -> None:
     with pytest.raises(TypeError):
         assert dhall.loads(dhall.dumps(xs)) == xs
 
@@ -48,7 +48,7 @@ def test_empty_list_in_list_of_lists(xs):
         )
     )
 )
-def test_list_mixed_sign_integers(lst):
+def test_list_mixed_sign_integers(lst: list[int]) -> None:
     with pytest.raises(TypeError):
         assert dhall.loads(dhall.dumps(lst)) == lst
 

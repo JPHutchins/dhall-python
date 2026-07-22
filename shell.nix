@@ -19,6 +19,8 @@ pkgs.mkShell {
   packages = with pkgs; [
     python310Packages.pytest
     ruff
+    mypy
+    pyright
     dhall
     dhall-json
     rust-analyzer

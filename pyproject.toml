@@ -43,6 +43,16 @@ sdist-include = ["dhall/*"]
 select = ["E", "F", "W", "I", "UP", "B"]
 ignore = ["E501"]
 
+[tool.mypy]
+strict = true
+python_version = "3.10"
+files = ["dhall", "tests"]
+
+[tool.pyright]
+include = ["dhall", "tests"]
+pythonVersion = "3.10"
+typeCheckingMode = "strict"
+
 [dependency-groups]
 dev = [
     "pytest~=7.0",
@@ -50,4 +60,6 @@ dev = [
     "hypothesis",
     "maturin>=1.7,<2",
     "ruff>=0.15,<0.16",
+    "mypy>=1.13",
+    "pyright>=1.1.400",
 ]
