@@ -1,37 +1,27 @@
-[tool.poetry]
+[project]
 name = "dhall"
 version = "0.1.17"
 description = "Python bindings for dhall, a functional configuration language"
-authors = ["Simon Zeng <contact@simonzeng.com>", "Tristan Cacqueray <tdecacqu@redhat.com>", "Matthias Endler <matthias-endler@gmx.net>"]
+authors = [
+    { name = "Simon Zeng", email = "contact@simonzeng.com" },
+    { name = "Tristan Cacqueray", email = "tdecacqu@redhat.com" },
+    { name = "Matthias Endler", email = "matthias-endler@gmx.net" },
+]
 license = "Apache-2.0"
 readme = "README.md"
-packages = [{ include = "dhall" }]
-repository = "https://github.com/s-zeng/dhall-python"
+requires-python = ">=3.10"
 keywords = ["dhall", "python"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
-    "License :: OSI Approved",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.7"
-
-[tool.poetry.dev-dependencies]
-pytest = "~=7.0"
-pylint = "~=2.6"
-flake8 = "~=5.0"
-wheel = "*"
-pytest-runner = "*"
-pytest-benchmark = "*"
-hypothesis = "*"
-autopep8 = "*"
-maturin = "~=1.1"
+[project.urls]
+repository = "https://github.com/s-zeng/dhall-python"
 
 [build-system]
 requires = ["maturin"]
@@ -41,3 +31,11 @@ build-backend = "maturin"
 compatibility = "manylinux_2_24"
 skip-auditwheel = false
 sdist-include = ["dhall/*"]
+
+[dependency-groups]
+dev = [
+    "pytest~=7.0",
+    "pytest-benchmark",
+    "hypothesis",
+    "maturin>=1.7,<2",
+]
