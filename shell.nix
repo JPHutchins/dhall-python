@@ -18,8 +18,6 @@ pkgs.mkShell {
   ];
   packages = with pkgs; [
     python310Packages.pytest
-    black
-    isort
     dhall
     dhall-json
     rust-analyzer
