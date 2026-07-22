@@ -27,3 +27,6 @@ Cargo.toml.orig
 
 # direnv
 .direnv/
+
+.claude
+.mcp.json
