@@ -114,3 +114,6 @@ perf.data
 perf.data.old
 Cargo.toml.orig
 .direnv/
+
+.claude
+.mcp.json
