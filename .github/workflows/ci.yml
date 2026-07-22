@@ -14,14 +14,17 @@ permissions:
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - uses: actions/setup-python@v5
+      - if: runner.os == 'Windows'
+        uses: ilammy/setup-nasm@v1
+      - uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.11"
-      - run: pip install poetry
-      - run: poetry install --no-root
-      - run: poetry run maturin develop
-      - run: poetry run pytest tests
+          enable-cache: true
+      - run: uv run pytest -v tests

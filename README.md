@@ -83,12 +83,7 @@ issues and PRs are always welcome.
 
 # Developer guide
 
-This project uses [poetry](https://python-poetry.org/docs/) for managing the development environment. If you don't have it installed, run
-
-```
-curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-export PATH="$HOME/.poetry/bin:$PATH"
-```
+This project uses [uv](https://docs.astral.sh/uv/) for managing the development environment. If you don't have it installed, follow the [installation guide](https://docs.astral.sh/uv/getting-started/installation/).
 
 The project requires the latest `stable` version of Rust.
 
