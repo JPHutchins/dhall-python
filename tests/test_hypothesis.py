@@ -11,7 +11,7 @@ st_naturals = st.integers(min_value=0, max_value=(2**53) - 1)
 st_int = st.integers(min_value=-(2**53) + 1, max_value=(2**53) - 1)
 st_floats = st.floats(min_value=-(2**53) + 1, max_value=(2**53) - 1)
 
-st_text = st.text(alphabet=st.characters(blacklist_categories=["Cn", "Cs"]))
+st_text = st.text(alphabet=st.characters(exclude_categories=("Cn", "Cs")))
 
 # st.floats would be nice, but then we need pytest.approx, which doesn't work with eg. text
 st_json = st.recursive(
@@ -31,32 +31,34 @@ st_passing_json = st.recursive(
 
 
 @given(st_floats)
-def test_floats(xs):
-    assert dhall.loads(dhall.dumps(xs).or_raise()).or_raise() == pytest.approx(xs)
+def test_floats(xs: float) -> None:
+    approx = pytest.approx(xs)  # pyright: ignore[reportUnknownMemberType]
+    assert dhall.loads(dhall.dumps(xs).or_raise()).or_raise() == approx
 
 
 @given(st_text)
-def test_text(xs):
+def test_text(xs: str) -> None:
     assert dhall.loads(dhall.dumps(xs).or_raise()).or_raise() == xs
 
 
 @given(st.booleans())
-def test_bool(xs):
+def test_bool(xs: bool) -> None:
     assert dhall.loads(dhall.dumps(xs).or_raise()).or_raise() == xs
 
 
 @given(st.lists(st_naturals, min_size=1))
-def test_list_naturals(lst):
+def test_list_naturals(lst: list[int]) -> None:
     assert dhall.loads(dhall.dumps(lst).or_raise()).or_raise() == lst
 
 
 @given(st.lists(st.floats(min_value=-(2**53) + 1, max_value=(2**53) - 1), min_size=1))
-def test_list_floats(lst):
-    assert dhall.loads(dhall.dumps(lst).or_raise()).or_raise() == pytest.approx(lst)
+def test_list_floats(lst: list[float]) -> None:
+    approx = pytest.approx(lst)  # pyright: ignore[reportUnknownMemberType]
+    assert dhall.loads(dhall.dumps(lst).or_raise()).or_raise() == approx
 
 
 @given(st.lists(st_text, min_size=1))
-def test_list_text(lst):
+def test_list_text(lst: list[str]) -> None:
     assert dhall.loads(dhall.dumps(lst).or_raise()).or_raise() == lst
 
 

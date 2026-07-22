@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import os
-from collections.abc import Callable, Generator
+from collections.abc import Callable, Generator, Mapping, Sequence
 from typing import Generic, NoReturn, Protocol, TypeAlias, TypeVar
 
 from . import dhall as _dhall
@@ -10,7 +10,13 @@ from .dhall import DhallError
 from .dhall import __version__ as __version__
 
 DhallValue: TypeAlias = (
-    bool | int | float | str | None | list["DhallValue"] | dict[str, "DhallValue"]
+    bool
+    | int
+    | float
+    | str
+    | None
+    | Sequence["DhallValue"]
+    | Mapping[str, "DhallValue"]
 )
 
 _T = TypeVar("_T")

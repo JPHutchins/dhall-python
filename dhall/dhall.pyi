@@ -1,9 +1,16 @@
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from typing import TypeAlias
 
 DhallValue: TypeAlias = (
-    bool | int | float | str | None | list["DhallValue"] | dict[str, "DhallValue"]
+    bool
+    | int
+    | float
+    | str
+    | None
+    | Sequence["DhallValue"]
+    | Mapping[str, "DhallValue"]
 )
 
 class DhallError(Exception): ...
