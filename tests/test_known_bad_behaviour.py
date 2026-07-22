@@ -1,6 +1,5 @@
 import string
 
-import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
@@ -29,16 +28,16 @@ st_failing_json = st.recursive(
 
 @given(st.none())
 def test_none(xs):
-    assert dhall.loads(dhall.dumps(xs)) != xs
-    assert dhall.loads(dhall.dumps(xs)) == {}
+    result = dhall.loads(dhall.dumps(xs).or_raise()).or_raise()
+    assert result != xs
+    assert result == {}
 
 
 # test lists of lists of integers w/ empty lists errors
 # e.g. [[3, 4], [6], []]
 @given(st.lists(st.lists(st_int), min_size=1).map(lambda lst: lst + [[]]))
 def test_empty_list_in_list_of_lists(xs):
-    with pytest.raises(TypeError):
-        assert dhall.loads(dhall.dumps(xs)) == xs
+    assert isinstance(dhall.dumps(xs), dhall.Err)
 
 
 @given(
@@ -49,8 +48,7 @@ def test_empty_list_in_list_of_lists(xs):
     )
 )
 def test_list_mixed_sign_integers(lst):
-    with pytest.raises(TypeError):
-        assert dhall.loads(dhall.dumps(lst)) == lst
+    assert isinstance(dhall.loads(dhall.dumps(lst).or_raise()), dhall.Err)
 
 
 # flaky test
