@@ -51,14 +51,15 @@ Supports the following:
 
 Python 3.5 and 3.6 support is available in older versions of dhall-python.
 
-dhall-python implements a similar API to Python's [json
-module](https://docs.python.org/3/library/json.html):
+dhall-python offers a `json`-style API. `loads`, `dumps`, `load`, and `dump`
+return a typed `Result` (`Ok` or `Err`) rather than raising; call `.or_raise()`
+to get the value (raising on failure), `.unwrap_or(default)`, or pattern-match:
 
 ```python
 >>> import dhall
->>> dhall.dumps({"keyA": 81, "keyB": True, "keyC": "value"})
+>>> dhall.dumps({"keyA": 81, "keyB": True, "keyC": "value"}).or_raise()
 '{ keyA = 81, keyB = True, keyC = "value" }'
->>> dhall.loads("""{ keyA = 81, keyB = True, keyC = "value" }""")
+>>> dhall.loads("""{ keyA = 81, keyB = True, keyC = "value" }""").or_raise()
 {'keyA': 81, 'keyB': True, 'keyC': 'value'}
 ```
 
