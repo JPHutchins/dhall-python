@@ -4,6 +4,8 @@ on:
   pull_request:
   push:
     branches: [master]
+  release:
+    types: [published]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -24,9 +26,66 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy, rustfmt
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: nextest
       - if: runner.os == 'Windows'
         uses: ilammy/setup-nasm@v1
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
       - run: uv run camas
+
+  wheels:
+    needs: ci
+    if: github.event_name == 'release'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: PyO3/maturin-action@v1
+        with:
+          command: build
+          args: --release --out dist
+          manylinux: ${{ runner.os == 'Linux' && '2_28' || 'auto' }}
+          sccache: "true"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.os }}
+          path: dist
+
+  sdist:
+    needs: ci
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: PyO3/maturin-action@v1
+        with:
+          command: sdist
+          args: --out dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-sdist
+          path: dist
+
+  publish:
+    needs: [wheels, sdist]
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dist-*
+          merge-multiple: true
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
