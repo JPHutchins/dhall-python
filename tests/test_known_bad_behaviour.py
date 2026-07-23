@@ -35,7 +35,7 @@ def test_none(xs: None) -> None:
 
 # test lists of lists of integers w/ empty lists errors
 # e.g. [[3, 4], [6], []]
-@given(st.lists(st.lists(st_int), min_size=1).map(lambda lst: lst + [[]]))
+@given(st.lists(st.lists(st_int), min_size=1).map(lambda lst: [*lst, []]))
 def test_empty_list_in_list_of_lists(xs: list[list[int]]) -> None:
     assert isinstance(dhall.dumps(xs), dhall.Err)
 

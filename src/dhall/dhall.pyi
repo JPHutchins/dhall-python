@@ -4,13 +4,7 @@ from collections.abc import Mapping, Sequence
 from typing import TypeAlias
 
 DhallValue: TypeAlias = (
-    bool
-    | int
-    | float
-    | str
-    | None
-    | Sequence["DhallValue"]
-    | Mapping[str, "DhallValue"]
+    bool | int | float | str | None | Sequence[DhallValue] | Mapping[str, DhallValue]
 )
 
 class DhallError(Exception): ...

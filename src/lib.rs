@@ -209,3 +209,342 @@ impl Serialize for SerializePyObject<'_, '_> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{dhall_error, dump, dumps, load, loads, DhallError};
+    use pyo3::ffi::c_str;
+    use pyo3::types::{PyAnyMethods, PyStringMethods, PyTypeMethods};
+    use pyo3::{Bound, Py, PyAny, Python};
+    use std::ffi::CStr;
+
+    fn is_dhall_error(py: Python<'_>, value: &Py<PyAny>) -> bool {
+        value
+            .bind(py)
+            .is_instance(&py.get_type::<DhallError>())
+            .unwrap()
+    }
+
+    fn eval<'py>(py: Python<'py>, expr: &CStr) -> Bound<'py, PyAny> {
+        py.eval(expr, None, None).unwrap()
+    }
+
+    fn dumped(py: Python<'_>, expr: &CStr, sort_keys: bool) -> Py<PyAny> {
+        dumps(py, &eval(py, expr), sort_keys)
+    }
+
+    fn dumped_str(py: Python<'_>, expr: &CStr, sort_keys: bool) -> String {
+        dumped(py, expr, sort_keys).extract::<String>(py).unwrap()
+    }
+
+    #[test]
+    fn parse_bool() {
+        Python::attach(|py| {
+            assert!(loads(py, "True").extract::<bool>(py).unwrap());
+            assert!(!loads(py, "False").extract::<bool>(py).unwrap());
+        });
+    }
+
+    #[test]
+    fn parse_natural() {
+        Python::attach(|py| {
+            assert_eq!(loads(py, "0").extract::<u64>(py).unwrap(), 0);
+            assert_eq!(loads(py, "42").extract::<u64>(py).unwrap(), 42);
+        });
+    }
+
+    #[test]
+    fn parse_integer() {
+        Python::attach(|py| {
+            assert_eq!(loads(py, "-5").extract::<i64>(py).unwrap(), -5);
+            assert_eq!(loads(py, "+7").extract::<i64>(py).unwrap(), 7);
+        });
+    }
+
+    #[test]
+    fn parse_double() {
+        Python::attach(|py| {
+            let value = loads(py, "3.5").extract::<f64>(py).unwrap();
+            assert!((value - 3.5).abs() < f64::EPSILON);
+        });
+    }
+
+    #[test]
+    fn parse_text() {
+        Python::attach(|py| {
+            assert_eq!(
+                loads(py, "\"hello\"").extract::<String>(py).unwrap(),
+                "hello"
+            );
+            assert_eq!(
+                loads(py, "\"h\u{e9}llo \u{2603}\"")
+                    .extract::<String>(py)
+                    .unwrap(),
+                "h\u{e9}llo \u{2603}"
+            );
+        });
+    }
+
+    #[test]
+    fn parse_optional_some() {
+        Python::attach(|py| {
+            assert_eq!(loads(py, "Some 1").extract::<u64>(py).unwrap(), 1);
+        });
+    }
+
+    #[test]
+    fn parse_optional_none() {
+        Python::attach(|py| {
+            assert!(loads(py, "None Natural").is_none(py));
+        });
+    }
+
+    #[test]
+    fn parse_list() {
+        Python::attach(|py| {
+            assert_eq!(
+                loads(py, "[1, 2, 3]").extract::<Vec<u64>>(py).unwrap(),
+                vec![1, 2, 3]
+            );
+        });
+    }
+
+    #[test]
+    fn parse_empty_list() {
+        Python::attach(|py| {
+            assert!(loads(py, "[] : List Natural")
+                .extract::<Vec<u64>>(py)
+                .unwrap()
+                .is_empty());
+        });
+    }
+
+    #[test]
+    fn parse_record() {
+        Python::attach(|py| {
+            let value = loads(py, "{ a = 1, b = \"x\" }");
+            let record = value.bind(py);
+            assert_eq!(record.get_item("a").unwrap().extract::<u64>().unwrap(), 1);
+            assert_eq!(
+                record.get_item("b").unwrap().extract::<String>().unwrap(),
+                "x"
+            );
+        });
+    }
+
+    #[test]
+    fn parse_empty_record() {
+        Python::attach(|py| {
+            assert_eq!(loads(py, "{=}").bind(py).len().unwrap(), 0);
+        });
+    }
+
+    #[test]
+    fn parse_union_without_payload() {
+        Python::attach(|py| {
+            assert_eq!(loads(py, "< A | B >.A").extract::<String>(py).unwrap(), "A");
+        });
+    }
+
+    #[test]
+    fn parse_union_with_payload() {
+        Python::attach(|py| {
+            assert_eq!(
+                loads(py, "< A : Natural | B >.A 1")
+                    .extract::<u64>(py)
+                    .unwrap(),
+                1
+            );
+        });
+    }
+
+    #[test]
+    fn parse_nested() {
+        Python::attach(|py| {
+            let value = loads(py, "{ xs = [ { y = 1 }, { y = 2 } ] }");
+            let xs = value.bind(py).get_item("xs").unwrap();
+            assert_eq!(
+                xs.get_item(0)
+                    .unwrap()
+                    .get_item("y")
+                    .unwrap()
+                    .extract::<u64>()
+                    .unwrap(),
+                1
+            );
+        });
+    }
+
+    #[test]
+    fn parse_error_syntax() {
+        Python::attach(|py| assert!(is_dhall_error(py, &loads(py, "{ a = }"))));
+    }
+
+    #[test]
+    fn parse_error_type_mismatch() {
+        Python::attach(|py| assert!(is_dhall_error(py, &loads(py, "1 + True"))));
+    }
+
+    #[test]
+    fn parse_error_not_a_simple_value() {
+        Python::attach(|py| assert!(is_dhall_error(py, &loads(py, "\\(x : Natural) -> x"))));
+    }
+
+    #[test]
+    fn dumps_record_single_key() {
+        Python::attach(|py| assert_eq!(dumped_str(py, c_str!("{'a': 1}"), false), "{ a = 1 }"));
+    }
+
+    #[test]
+    fn dumps_record_matches_reference() {
+        Python::attach(|py| {
+            assert_eq!(
+                dumped_str(
+                    py,
+                    c_str!("{'keyA': 81, 'keyB': True, 'keyC': 'value'}"),
+                    false
+                ),
+                "{ keyA = 81, keyB = True, keyC = \"value\" }"
+            );
+        });
+    }
+
+    #[test]
+    fn dumps_list() {
+        Python::attach(|py| assert_eq!(dumped_str(py, c_str!("[1, 2, 3]"), false), "[1, 2, 3]"));
+    }
+
+    #[test]
+    fn dumps_tuple_as_list() {
+        Python::attach(|py| {
+            assert_eq!(dumped_str(py, c_str!("(1, 2, 3)"), false), "[1, 2, 3]");
+        });
+    }
+
+    #[test]
+    fn dumps_text() {
+        Python::attach(|py| assert_eq!(dumped_str(py, c_str!("'hello'"), false), "\"hello\""));
+    }
+
+    #[test]
+    fn dumps_bool() {
+        Python::attach(|py| {
+            assert_eq!(dumped_str(py, c_str!("True"), false), "True");
+            assert_eq!(dumped_str(py, c_str!("False"), false), "False");
+        });
+    }
+
+    #[test]
+    fn dumps_natural() {
+        Python::attach(|py| assert_eq!(dumped_str(py, c_str!("7"), false), "7"));
+    }
+
+    #[test]
+    fn dumps_negative_integer() {
+        Python::attach(|py| assert_eq!(dumped_str(py, c_str!("-5"), false), "-5"));
+    }
+
+    #[test]
+    fn dumps_double() {
+        Python::attach(|py| assert_eq!(dumped_str(py, c_str!("3.5"), false), "3.5"));
+    }
+
+    #[test]
+    fn dumps_none_is_empty_record() {
+        Python::attach(|py| assert_eq!(dumped_str(py, c_str!("None"), false), "{=}"));
+    }
+
+    #[test]
+    fn sort_keys_matches_default() {
+        Python::attach(|py| {
+            assert_eq!(
+                dumped_str(py, c_str!("{'b': 1, 'a': 2}"), true),
+                dumped_str(py, c_str!("{'b': 1, 'a': 2}"), false)
+            );
+        });
+    }
+
+    #[test]
+    fn dumps_error_set() {
+        Python::attach(|py| assert!(is_dhall_error(py, &dumped(py, c_str!("{1, 2, 3}"), false))));
+    }
+
+    #[test]
+    fn dumps_error_complex() {
+        Python::attach(|py| assert!(is_dhall_error(py, &dumped(py, c_str!("1j"), false))));
+    }
+
+    #[test]
+    fn round_trip_record() {
+        Python::attach(|py| {
+            let obj = eval(py, c_str!("{'a': 1, 'b': [1, 2], 'c': 'x'}"));
+            let text = dumps(py, &obj, false).extract::<String>(py).unwrap();
+            assert!(loads(py, &text).bind(py).eq(&obj).unwrap());
+        });
+    }
+
+    #[test]
+    fn dhall_error_is_instance_with_message() {
+        Python::attach(|py| {
+            let error = dhall_error(py, "boom");
+            assert!(is_dhall_error(py, &error));
+            assert_eq!(
+                error.bind(py).str().unwrap().to_str().unwrap().to_owned(),
+                "boom"
+            );
+        });
+    }
+
+    #[test]
+    fn load_reads_from_file_like() {
+        Python::attach(|py| {
+            let fp = py
+                .import("io")
+                .unwrap()
+                .call_method1("StringIO", ("{ a = 1 }",))
+                .unwrap();
+            let value = load(py, &fp);
+            assert_eq!(
+                value
+                    .bind(py)
+                    .get_item("a")
+                    .unwrap()
+                    .extract::<u64>()
+                    .unwrap(),
+                1
+            );
+        });
+    }
+
+    #[test]
+    fn dump_writes_to_file_like() {
+        Python::attach(|py| {
+            let fp = py.import("io").unwrap().call_method0("StringIO").unwrap();
+            let obj = eval(py, c_str!("{'a': 1}"));
+            assert!(dump(py, &obj, &fp, false).is_none(py));
+            assert_eq!(
+                fp.call_method0("getvalue")
+                    .unwrap()
+                    .extract::<String>()
+                    .unwrap(),
+                "{ a = 1 }"
+            );
+        });
+    }
+
+    #[test]
+    fn dump_reports_serialization_error() {
+        Python::attach(|py| {
+            let fp = py.import("io").unwrap().call_method0("StringIO").unwrap();
+            let obj = eval(py, c_str!("1j"));
+            assert!(is_dhall_error(py, &dump(py, &obj, &fp, false)));
+        });
+    }
+
+    #[test]
+    fn type_name_of_dhall_error() {
+        Python::attach(|py| {
+            assert_eq!(py.get_type::<DhallError>().name().unwrap(), "DhallError");
+        });
+    }
+}
