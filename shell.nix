@@ -1,12 +1,19 @@
-{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/refs/tags/22.11.tar.gz") {} }:
+{
+  pkgs ?
+    import
+      (fetchTarball {
+        url = "https://github.com/NixOS/nixpkgs/archive/ac62194c3917d5f474c1a844b6fd6da2db95077d.tar.gz";
+        sha256 = "0v6bd1xk8a2aal83karlvc853x44dg1n4nk08jg3dajqyy0s98np";
+      })
+      { },
+}:
 
 pkgs.mkShell {
   buildInputs = with pkgs; [
     poetry
     rustc
     cargo
-    darwin.apple_sdk.frameworks.Security
-    pkgconfig
+    pkg-config
     openssl
   ];
   packages = with pkgs; [
@@ -18,22 +25,3 @@ pkgs.mkShell {
     rust-analyzer
   ];
 }
-#
-# let
-#   myAppEnv = pkgs.poetry2nix.mkPoetryEnv {
-#     projectDir = ./.;
-#     editablePackageSources = {
-#       my-app = ./src;
-#     };
-#   };
-# in myAppEnv.env.overrideAttrs (oldAttrs: {
-#   buildInputs = [
-#     pkgs.rustc
-#     pkgs.cargo
-#   ];
-#   packages = [
-#     pkgs.python310Packages.pytest
-#     pkgs.black
-#     pkgs.isort
-#   ];
-# })
