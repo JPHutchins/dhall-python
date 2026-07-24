@@ -15,6 +15,7 @@ pkgs.mkShell {
     cargo
     clippy
     rustfmt
+    cargo-nextest
     pkg-config
     openssl
   ];

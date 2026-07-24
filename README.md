@@ -101,14 +101,18 @@ If you have already installed the `stable` version, make sure it is up-to-date:
 rustup update stable
 ```
 
-After that, build the extension and run the full check suite (ruff, mypy, pyright, clippy, and the tests) with:
+After that, sync the environment and run the checks with:
 
 ```
 uv sync
 uv run camas
 ```
 
-Tasks are defined in `tasks.py`; `uv run camas --list` shows them and `uv run camas fmt` auto-formats.
+The Python package lives in `src/dhall/`; the Rust extension is `src/lib.rs`,
+compiled into the package as the private `dhall.dhall` submodule.
+
+`uv run camas --list` shows the tasks (`uv run camas fmt` auto-formats). CI runs
+`uv run camas`, so it reproduces locally.
 
 
 [dhall-rust]: https://github.com/Nadrieril/dhall-rust

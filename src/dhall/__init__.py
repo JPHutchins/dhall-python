@@ -3,10 +3,10 @@ from __future__ import annotations
 import contextlib
 import os
 from collections.abc import Callable, Generator, Mapping, Sequence
-from typing import Generic, NoReturn, Protocol, TypeAlias, TypeVar
+from typing import Final, Generic, NoReturn, Protocol, TypeAlias, TypeVar
 
 from . import dhall as _dhall
-from .dhall import DhallError
+from .dhall import DhallError as DhallError
 from .dhall import __version__ as __version__
 
 DhallValue: TypeAlias = (
@@ -36,10 +36,11 @@ class SupportsWrite(Protocol[_T_contra]):
 
 
 class Ok(Generic[_T]):
+    __slots__ = ("value",)
     __match_args__ = ("value",)
 
     def __init__(self, value: _T) -> None:
-        self.value = value
+        self.value: Final = value
 
     def is_ok(self) -> bool:
         return True
@@ -55,10 +56,11 @@ class Ok(Generic[_T]):
 
 
 class Err(Generic[_T]):
+    __slots__ = ("error",)
     __match_args__ = ("error",)
 
     def __init__(self, error: DhallError) -> None:
-        self.error = error
+        self.error: Final = error
 
     def is_ok(self) -> bool:
         return False
