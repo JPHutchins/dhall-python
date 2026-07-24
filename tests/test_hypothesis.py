@@ -32,34 +32,32 @@ st_passing_json = st.recursive(
 
 @given(st_floats)
 def test_floats(xs):
-    assert dhall.loads(dhall.dumps(xs)) == pytest.approx(xs)  # fails when abs=0.05
+    assert dhall.loads(dhall.dumps(xs).or_raise()).or_raise() == pytest.approx(xs)
 
 
 @given(st_text)
 def test_text(xs):
-    assert dhall.loads(dhall.dumps(xs)) == xs
+    assert dhall.loads(dhall.dumps(xs).or_raise()).or_raise() == xs
 
 
 @given(st.booleans())
 def test_bool(xs):
-    assert dhall.loads(dhall.dumps(xs)) == xs
+    assert dhall.loads(dhall.dumps(xs).or_raise()).or_raise() == xs
 
 
 @given(st.lists(st_naturals, min_size=1))
 def test_list_naturals(lst):
-    assert dhall.loads(dhall.dumps(lst)) == lst
+    assert dhall.loads(dhall.dumps(lst).or_raise()).or_raise() == lst
 
 
-@given(
-    st.lists(st.floats(min_value=-(2**53) + 1, max_value=(2**53) - 1), min_size=1)
-)
+@given(st.lists(st.floats(min_value=-(2**53) + 1, max_value=(2**53) - 1), min_size=1))
 def test_list_floats(lst):
-    assert dhall.loads(dhall.dumps(lst)) == pytest.approx(lst)
+    assert dhall.loads(dhall.dumps(lst).or_raise()).or_raise() == pytest.approx(lst)
 
 
 @given(st.lists(st_text, min_size=1))
 def test_list_text(lst):
-    assert dhall.loads(dhall.dumps(lst)) == lst
+    assert dhall.loads(dhall.dumps(lst).or_raise()).or_raise() == lst
 
 
 # TODO: fix https://pipelines.actions.githubusercontent.com/bvEb9nCIBV2sqdaDi8oIyVnWMTk9yQhCrOseL3I17XXo50cO3u/_apis/pipelines/1/runs/6/signedlogcontent/12?urlExpires=2020-10-31T16%3A16%3A29.9424385Z&urlSigningMethod=HMACV1&urlSignature=HNlGC9qiZr5whn66mFkdJlMoavo7ycV6%2BH9icX7mmRA%3D
