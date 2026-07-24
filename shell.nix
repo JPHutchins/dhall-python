@@ -10,7 +10,7 @@
 
 pkgs.mkShell {
   buildInputs = with pkgs; [
-    poetry
+    uv
     rustc
     cargo
     pkg-config
