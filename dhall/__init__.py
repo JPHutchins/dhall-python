@@ -7,6 +7,7 @@ from typing import Generic, NoReturn, Protocol, TypeAlias, TypeVar
 
 from . import dhall as _dhall
 from .dhall import DhallError
+from .dhall import __version__ as __version__
 
 DhallValue: TypeAlias = (
     bool | int | float | str | None | list["DhallValue"] | dict[str, "DhallValue"]
@@ -90,7 +91,9 @@ def dumps(obj: DhallValue, sort_keys: bool = False) -> Result[str]:
     return _wrap(_dhall.dumps(obj, sort_keys))
 
 
-def dump(obj: DhallValue, fp: SupportsWrite[str], sort_keys: bool = False) -> Result[None]:
+def dump(
+    obj: DhallValue, fp: SupportsWrite[str], sort_keys: bool = False
+) -> Result[None]:
     return _wrap(_dhall.dump(obj, fp, sort_keys))
 
 
