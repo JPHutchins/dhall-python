@@ -17,7 +17,6 @@ pkgs.mkShell {
     openssl
   ];
   packages = with pkgs; [
-    python310Packages.pytest
     dhall
     dhall-json
     rust-analyzer
