@@ -13,6 +13,8 @@ pkgs.mkShell {
     uv
     rustc
     cargo
+    clippy
+    rustfmt
     pkg-config
     openssl
   ];

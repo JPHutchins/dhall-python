@@ -22,9 +22,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
       - if: runner.os == 'Windows'
         uses: ilammy/setup-nasm@v1
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-      - run: uv run pytest -v tests
+      - run: uv run camas

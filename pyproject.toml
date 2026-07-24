@@ -2,28 +2,28 @@
 name = "dhall"
 description = "Python bindings for dhall, a functional configuration language"
 authors = [
-    { name = "Simon Zeng", email = "contact@simonzeng.com" },
-    { name = "Tristan Cacqueray", email = "tdecacqu@redhat.com" },
-    { name = "Matthias Endler", email = "matthias-endler@gmx.net" },
+{ name = "Simon Zeng", email = "contact@simonzeng.com" },
+{ name = "Tristan Cacqueray", email = "tdecacqu@redhat.com" },
+{ name = "Matthias Endler", email = "matthias-endler@gmx.net" },
 ]
 license = "Apache-2.0"
 readme = "README.md"
 requires-python = ">=3.10"
 keywords = ["dhall", "python"]
 classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Operating System :: MacOS",
-    "Operating System :: Microsoft :: Windows",
-    "Operating System :: POSIX :: Linux",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
-    "Programming Language :: Rust",
-    "Typing :: Typed",
+"Development Status :: 4 - Beta",
+"Intended Audience :: Developers",
+"Operating System :: MacOS",
+"Operating System :: Microsoft :: Windows",
+"Operating System :: POSIX :: Linux",
+"Programming Language :: Python :: 3",
+"Programming Language :: Python :: 3.10",
+"Programming Language :: Python :: 3.11",
+"Programming Language :: Python :: 3.12",
+"Programming Language :: Python :: 3.13",
+"Programming Language :: Python :: 3.14",
+"Programming Language :: Rust",
+"Typing :: Typed",
 ]
 dynamic = ["version"]
 
@@ -55,11 +55,13 @@ typeCheckingMode = "strict"
 
 [dependency-groups]
 dev = [
-    "pytest>=9,<10",
-    "pytest-benchmark>=5,<6",
-    "hypothesis>=6,<7",
-    "maturin>=1.9,<2",
-    "ruff>=0.15,<0.16",
-    "mypy>=2,<3",
-    "pyright>=1.1.400",
+"pytest>=9,<10",
+"pytest-benchmark>=5,<6",
+"hypothesis>=6,<7",
+"maturin>=1.9,<2",
+"ruff>=0.15,<0.16",
+"mypy>=2,<3",
+"pyright>=1.1.400",
+"camas[mcp]==0.1.28",
+"actionlint-py>=1.7,<2",
 ]
