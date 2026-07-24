@@ -1,6 +1,5 @@
 [project]
 name = "dhall"
-version = "0.1.17"
 description = "Python bindings for dhall, a functional configuration language"
 authors = [
     { name = "Simon Zeng", email = "contact@simonzeng.com" },
@@ -18,7 +17,15 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Rust",
+    "Typing :: Typed",
 ]
+dynamic = ["version"]
 
 [project.urls]
 repository = "https://github.com/s-zeng/dhall-python"
@@ -28,7 +35,7 @@ requires = ["maturin>=1.9,<2"]
 build-backend = "maturin"
 
 [tool.maturin]
-compatibility = "manylinux_2_24"
+compatibility = "manylinux_2_28"
 skip-auditwheel = false
 sdist-include = ["dhall/*"]
 
